@@ -1,0 +1,21 @@
+# Container image that runs your code
+FROM ubuntu:24.04
+
+
+RUN apt-get update -y 
+
+# -- binary libraries
+COPY scripts/libs /scripts/libs
+COPY --chmod=755 scripts/bin-libs.sh /scripts/bin-libs.sh
+RUN /scripts/bin-libs.sh
+
+# -- build, check and install R versions from source
+COPY scripts/r_versions /scripts/r_versions
+COPY --chmod=755 scripts/add_r_versions.sh /scripts/add_r_versions.sh
+RUN /scripts/add_r_versions.sh
+
+
+
+
+
+
