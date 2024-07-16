@@ -44,3 +44,4 @@ libblas-dev
 liblapack-dev
 texlive
 texinfo  
+texlive-fonts-extra
