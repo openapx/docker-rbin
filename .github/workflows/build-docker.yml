@@ -64,8 +64,8 @@ jobs:
           file: docker/rbin/Dockerfile-${{ env.OS_TAG }}
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/rbin:${{ vars.VERSION_MAJOR }}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-dev-${{ env.OS_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/rbin:dev-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:${{ vars.VERSION_MAJOR }}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-dev-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:dev-${{ env.OS_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
 
 
@@ -78,10 +78,10 @@ jobs:
           file: docker/rbin/Dockerfile-${{ env.OS_TAG }}
           push: true
           tags: |
-            ${{ secrets.DOCKER_USERNAME }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-${{ env.OS_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-${{ github.sha}}-${{ env.OS_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}-latest-${{ env.OS_TAG }}
-            ${{ secrets.DOCKER_USERNAME }}/rbin:latest-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-${{ github.sha}}-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}-latest-${{ env.OS_TAG }}
+            ${{ github.repository_owner }}/rbin:latest-${{ env.OS_TAG }}
           labels: ${{ steps.meta.outputs.labels }}
 
       
