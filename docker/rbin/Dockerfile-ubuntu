@@ -4,6 +4,9 @@ FROM ubuntu:24.04
 
 RUN apt-get update -y 
 
+# -- add license file to root directory
+COPY LICENSE /LICENSE
+
 # -- binary libraries
 COPY scripts/libs /scripts/libs
 COPY --chmod=755 scripts/bin-libs.sh /scripts/bin-libs.sh
