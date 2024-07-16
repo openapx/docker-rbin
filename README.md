@@ -7,7 +7,7 @@ The images are availabe on Docker Hub https://hub.docker.com/r/openapx/rbin.
 
 ### Getting Started
 
-The images are available on Docker Hub in the openapx/rbin repository
+All images are available on Docker Hub in the openapx/rbin repository
 
 The latest release for ubuntu
 ```
@@ -15,7 +15,7 @@ docker pull openapx/rbin:latest-ubuntu
 ```
 
 
-The latest deelopment release for ubuntu 
+The latest development release for ubuntu 
 ```
 docker pull openapx/rbin:dev-ubuntu
 ```
