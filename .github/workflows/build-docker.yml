@@ -15,6 +15,12 @@ on:
       - main
       - dev
       - development
+    paths:
+      - libs
+      - r_versions
+      - scripts/*
+      - docker/rbin/*
+      - .github/workflows/*
 
 env:
   OS_TAG: "ubuntu"
