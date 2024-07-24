@@ -80,6 +80,9 @@ for BUILD_VER in $(grep "^[^#;]" $(dirname $0)/r_versions | tr '\n' ' '); do
   # -- open up site-library for writing
   chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/lib/R/site-library
 
+  # -- make R and Rscript executable
+  chmod u+rx-w,g+rx-w,o+rx-w /opt/R/${BUILD_VER}/bin/*
+
 done
 
 
