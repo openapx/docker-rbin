@@ -1,7 +1,7 @@
 #! /bin/bash
 
 # -- set up working directories
-mkdir -p /sources/R /builds /logs/R/builds
+mkdir -p /sources/R /builds /logs/R/rbin/builds
 
 
 # -- process R version
@@ -22,11 +22,11 @@ for BUILD_VER in $(grep "^[^#;]" $(dirname $0)/r_versions | tr '\n' ' '); do
   tar -xf /sources/R/R-${BUILD_VER}.tar.gz
 
 
-  find /builds/sources/R-${BUILD_VER}/ -type f -exec md5sum {} + > /logs/R/builds/R-${BUILD_VER}-sources.md5
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-sources.md5
+  find /builds/sources/R-${BUILD_VER}/ -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
 
-  find /builds/sources/R-${BUILD_VER}/ -type f -exec sha256sum {} + > /logs/R/builds/R-${BUILD_VER}-sources.sha256
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-sources.sha256
+  find /builds/sources/R-${BUILD_VER}/ -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
 
 
 
@@ -37,36 +37,36 @@ for BUILD_VER in $(grep "^[^#;]" $(dirname $0)/r_versions | tr '\n' ' '); do
   	                              --enable-R-shlib \
 				      --with-blas \
 				      --with-lapack \
-				      --with-recommended-packages=no > /logs/R/builds/R-${BUILD_VER}-config.log
+				      --with-recommended-packages=no > /logs/R/rbin/builds/R-${BUILD_VER}-config.log
 
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-config.log
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-config.log
 
 
 
 
   # -- build 
-  make > /logs/R/builds/R-${BUILD_VER}-make.log
+  make > /logs/R/rbin/builds/R-${BUILD_VER}-make.log
 
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-make.log
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-make.log
 
 
   # -- check build
-  make check-all > /logs/R/builds/R-${BUILD_VER}-check.log
+  make check-all > /logs/R/rbin/builds/R-${BUILD_VER}-check.log
 
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-check.log
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-check.log
 
 
   # -- install build 
-  make install > /logs/R/builds/R-${BUILD_VER}-install.log
+  make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log
 
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-install.log
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.log
 
 
-  find /opt/R/${BUILD_VER} -type f -exec md5sum {} + > /logs/R/builds/R-${BUILD_VER}-install.md5
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-install.md5
+  find /opt/R/${BUILD_VER} -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
 
-  find /opt/R/${BUILD_VER} -type f -exec sha256sum {} + > /logs/R/builds/R-${BUILD_VER}-install.sha256
-  gzip -9 /logs/R/builds/R-${BUILD_VER}-install.sha256
+  find /opt/R/${BUILD_VER} -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
 
 
   # -- initiate site library
