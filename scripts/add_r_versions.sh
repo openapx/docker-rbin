@@ -72,6 +72,14 @@ for BUILD_VER in $(grep "^[^#;]" $(dirname $0)/r_versions | tr '\n' ' '); do
   # -- initiate site library
   mkdir -p /opt/R/${BUILD_VER}/lib/R/site-library
 
+
+  # -- secure the install location
+  find /opt/R/${BUILD_VER} -type f -exec chmod u+r-wx,g+r-wx,o+r-wx {} \;
+  find /opt/R/${BUILD_VER} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+
+  # -- open up site-library for writing
+  chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/lib/R/site-library
+
 done
 
 
