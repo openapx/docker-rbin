@@ -1,23 +1,31 @@
-# Container image that runs your code
+# Version specific
 FROM ubuntu:24.04
 
 
+# -- update OS to latest patch
 RUN apt-get update -y 
 
 # -- add license file to root directory
-COPY LICENSE /LICENSE
+COPY LICENSE /LICENSE-rbin
 
 # -- binary libraries
-COPY scripts/libs /scripts/libs
+# note: difference in repo location for libs file
+
+COPY libs /scripts/libs
 COPY --chmod=755 scripts/bin-libs.sh /scripts/bin-libs.sh
 RUN /scripts/bin-libs.sh
 
+
 # -- build, check and install R versions from source
-COPY scripts/r_versions /scripts/r_versions
+# note: difference in repo location for r_versions control file
+
+COPY r_versions /scripts/r_versions
 COPY --chmod=755 scripts/add_r_versions.sh /scripts/add_r_versions.sh
 RUN /scripts/add_r_versions.sh
 
 
+# -- clean up
+RUN rm -Rf /scripts
 
 
 
