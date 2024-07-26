@@ -13,8 +13,8 @@ COPY LICENSE /LICENSE-rbin
 COPY libs /opt/openapx/config/rbin/libs
 COPY r_versions /opt/openapx/config/rbin/r_versions
 
-RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; \
-    find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \;
+RUN /usr/bin/find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \\; \
+    /usr/bin/find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \\;
 
 
 # -- binary libraries
