@@ -8,7 +8,7 @@ mkdir -p /sources/R /builds /logs/R/rbin/builds
 #
 #
 
-for BUILD_VER in $(grep "^[^#;]" $(dirname $0)/r_versions | tr '\n' ' '); do
+for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' ' '); do
 
   # -- download source	
   cd /sources/R
