@@ -8,18 +8,21 @@ RUN apt-get update -y
 # -- add license file to root directory
 COPY LICENSE /LICENSE-rbin
 
-# -- binary libraries
-# note: difference in repo location for libs file
+# -- configuration files
+#    note: this is the input location for Shell scripts below
+COPY libs /opt/openapx/config/rbin/libs
+COPY r_versions /opt/openapx/config/rbin/r_versions
 
-COPY libs /scripts/libs
+RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; \
+    find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \;
+
+
+# -- binary libraries
 COPY --chmod=755 scripts/bin-libs.sh /scripts/bin-libs.sh
 RUN /scripts/bin-libs.sh
 
 
 # -- build, check and install R versions from source
-# note: difference in repo location for r_versions control file
-
-COPY r_versions /scripts/r_versions
 COPY --chmod=755 scripts/add_r_versions.sh /scripts/add_r_versions.sh
 RUN /scripts/add_r_versions.sh
 
