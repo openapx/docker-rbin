@@ -7,8 +7,8 @@ FROM ubuntu:24.04
 
 COPY libs r_versions /opt/openapx/config/rbin/
 
-RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \\; && \
-    find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \\;
+RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; && \
+    find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \;
 
 
 
