@@ -5,6 +5,6 @@
 apt-get update -y
 
 # -- install any binary library dependenceis
-apt-get install $(cat $(dirname $0)/libs | tr '\n' ' ') -y --no-install-recommends
+apt-get install $(grep "^[^#;]" /opt/openapx/config/rbin/libs | tr '\n' ' ') -y --no-install-recommends
 
 
