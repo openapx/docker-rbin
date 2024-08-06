@@ -41,8 +41,8 @@ libpng
 libpng-devel
 libtiff
 libtiff-devel
-libxt
-libxt-devel
+libXt
+libXt-devel
 liblas-devel
 lapack-devel
 texlive
