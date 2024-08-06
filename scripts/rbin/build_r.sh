@@ -62,7 +62,7 @@ for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' '
   	                              --enable-R-shlib \
 				      --with-blas \
 				      --with-lapack \
-				      --with-recommended-packages=no > /logs/R/rbin/builds/R-${BUILD_VER}-config.log
+				      --with-recommended-packages=no > /logs/R/rbin/builds/R-${BUILD_VER}-config.log 2>&1
 
   gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-config.log
 
@@ -71,15 +71,15 @@ for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' '
 
   # -- build 
   echo "   build R ${BUILD_VER}"
-  make > /logs/R/rbin/builds/R-${BUILD_VER}-make.log
+  make > /logs/R/rbin/builds/R-${BUILD_VER}-make.log 2>&1
 
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-make.log
+  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-make.log 
 
 
   # -- check build
   echo "   check R ${BUILD_VER} build"
 
-  make check-all > /logs/R/rbin/builds/R-${BUILD_VER}-check.log
+  make check-all > /logs/R/rbin/builds/R-${BUILD_VER}-check.log 2>&1
 
   gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-check.log
 
@@ -87,7 +87,7 @@ for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' '
   # -- install build 
   echo "-- install R ${BUILD_VER}"
 
-  make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log
+  make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log 2>&1
 
   gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.log
 
@@ -100,9 +100,14 @@ for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' '
 
 
   # -- initiate site library
+
   echo "-- initiate R ${BUILD_VER} site library"
 
-  mkdir -p /opt/R/${BUILD_VER}/lib/R/site-library
+  # identify lib directory .. sometime it is lib .. on others it is lib64 ... use ../R/library/base/DESCRIPTION (package) as trigger
+  RLIBX=$( find /opt/R/${BUILD_VER} -type f -name DESCRIPTION | grep "/R/library/base/DESCRIPTION$" | awk -F/ '{print $5}' )
+
+
+  mkdir -p /opt/R/${BUILD_VER}/${RLIBX}/R/site-library
 
 
   # -- secure the install location
@@ -112,10 +117,10 @@ for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' '
   find /opt/R/${BUILD_VER} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
 
   # -- open up site-library for writing
-  chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/lib/R/site-library
+  chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/${RLIBX}/R/site-library
 
   # -- make R executable again 
-  find /opt/R/${BUILD_VER}/lib/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+  find /opt/R/${BUILD_VER}/${RLIBX}/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
   chmod u+rx-w,g+rx-w,o+rx-w /opt/R/${BUILD_VER}/bin/*
 
   echo "-- R ${BUILD_VER} build and install completed"
