@@ -1,0 +1,33 @@
+# For now ... rely on latest rockylinux baseline OS
+FROM openapx/baseline-os:latest-rockylinux
+
+# -- add license file to root directory
+COPY LICENSE /LICENSE-rbin
+RUN  chmod u+r-wx,g+r-wx,o+r-wx /LICENSE-rbin
+
+
+# -- configuration files
+#    note: this is the input location for Shell scripts below
+
+COPY libs-rockylinux r_versions /opt/openapx/config/rbin/
+
+RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; && \
+    find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \;
+
+
+# -- scripted sequence
+#    1) enable CRB repositoru
+#    2) add binary library dependencies
+#    3) download, build, check and install R from source
+#    4+5) secure log directory
+#    6) clean-up
+
+COPY --chmod=755 scripts/rbin/build_r.sh /scripts/rbin/
+RUN dnf config-manager --enable crb && \
+    /opt/openapx/utilities/bin-libs.sh /opt/openapx/config/rbin/libs-rockylinux && \
+    /scripts/rbin/build_r.sh && \
+    find /logs/R/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; && \
+    find /logs/R/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \; && \
+    rm -Rf /scripts
+
+
