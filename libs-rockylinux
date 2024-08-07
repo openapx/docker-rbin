@@ -18,7 +18,7 @@ ca-certificates
 file
 bzip2
 bzip2-libs
-libcurl
+# libcurl  <-- libcurl-minimal already installed
 libcurl-devel
 libicu
 libicu-devel
