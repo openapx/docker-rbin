@@ -3,9 +3,6 @@ A binary complete container hosting multiple versions of R for the Life Science 
 
 The container will include the last three minor releases of R as long as they can be built with and on the same set of compilers, binary utilities, tools, etc. If a minor release has multiple patches, only the last patch is support with any preceding patches (that were included) will be deprecated over time.
 
-*During the development phase of openapx rbin, only images based on Ubuntu 24.04 will be available.*
-
-
 <br>
 
 ### Getting Started
@@ -23,12 +20,15 @@ The latest development release (corresponds to the *development* branch) can be 
 docker pull openapx/rbin:dev-ubuntu
 ```
 
+Images currently available are based on Ubuntu, Debian, Fedora and Rocky Linux.
+
+
 <br>
 
 ### Basic configuration
 All R versions are built from source automatically pulled from the R project (https://r-project.org) during the build process.
 
-The binary dependencies as specified by the `libs` file at the root of the repository are installed prior to the first build of R.
+The binary dependencies as specified by the `libs-<os>` file at the root of the repository are installed prior to the first build of R.
 
 The standard minimal build configuration is used. 
 
@@ -40,7 +40,7 @@ The standard minimal build configuration is used.
             --with-recommended-packages=no
 ```
 
-Recommended packages are not included as they may require additional validation.
+Recommended packages are not included as they may require additional validation depending on your organization.
 
 The R versions are installed in the directory `/opt/R/<version>` to permit multiple versions of R.
 
