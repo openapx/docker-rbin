@@ -1,131 +1,134 @@
 #! /bin/bash
 
 # -- set up working directories
-echo "--- set up script scaffolding"
 mkdir -p /sources/R /builds /logs/R/rbin/builds
-
-
-# -- process R version
-#
-#
 
 # -- R source repository
 REPO=https://cran.r-project.org/src/base/R-4
 
 
-for BUILD_VER in $(grep "^[^#;]" /opt/openapx/config/rbin/r_versions | tr '\n' ' '); do
+# -- identify R verison to build
+echo "-- identify R version"
 
-  echo "-- build R version ${BUILD_VER}"
+XSOURCE=$( wget -q -O - ${REPO}/ | \
+           grep -io '<a href=['"'"'"][^"'"'"']*['"'"'"]' | \
+           sed -e 's/^<a href=["'"'"']//i' -e 's/["'"'"']$//i' | \
+           grep "^R-.*.tar.gz$" | \
+           sort -r | \
+           head -n1 )
 
-  # -- download source	
+BUILD_VER=$(echo ${XSOURCE} | sed -n 's/^R-\(.*\).tar.gz$/\1/p')
 
-  XSOURCE=R-${BUILD_VER}.tar.gz
-  URL=${REPO}/${XSOURCE}
-
-  echo "   downloading ${URL}"
-  wget --no-check-certificate --quiet --directory-prefix=/sources/R ${URL}
-
-  _MD5=($(md5sum /sources/R/${XSOURCE})) 
-  _SHA256=($(sha256sum /sources/R/${XSOURCE}))
-
-  echo "   ${XSOURCE} (MD5 ${_MD5} / SHA-256 ${_SHA256})"
-
-  unset _MD5
-  unset _SHA256
-
-
-  # -- set up build area
-  echo "   set up build area"
-
-  mkdir -p /builds/R-${BUILD_VER} /builds/sources
-
-  # -- unpack tar
-  echo "   extract sources"
-
-  cd /builds/sources
-  tar -xf /sources/R/R-${BUILD_VER}.tar.gz
-
-  find /builds/sources/R-${BUILD_VER}/ -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
-
-  find /builds/sources/R-${BUILD_VER}/ -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
+echo "   R version ${BUILD_VER}"
 
 
 
-  # -- configure
-  echo "   configure R ${BUILD_VER}"
+# -- download 
 
-  cd /builds/R-${BUILD_VER}
+URL=${REPO}/${XSOURCE}
+echo "-- downloading ${URL}"
+wget --no-check-certificate --quiet --directory-prefix=/sources/R ${URL}
 
-  ../sources/R-${BUILD_VER}/configure --prefix=/opt/R/${BUILD_VER} \
-  	                              --enable-R-shlib \
-				      --with-blas \
-				      --with-lapack \
-				      --with-recommended-packages=no > /logs/R/rbin/builds/R-${BUILD_VER}-config.log 2>&1
+_MD5=($(md5sum /sources/R/${XSOURCE}))
+_SHA256=($(sha256sum /sources/R/${XSOURCE}))
 
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-config.log
+echo "   ${XSOURCE} (MD5 ${_MD5} / SHA-256 ${_SHA256})"
 
-
-
-
-  # -- build 
-  echo "   build R ${BUILD_VER}"
-  make > /logs/R/rbin/builds/R-${BUILD_VER}-make.log 2>&1
-
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-make.log 
+unset _MD5
+unset _SHA256
 
 
-  # -- check build
-  echo "   check R ${BUILD_VER} build"
 
-  make check-all > /logs/R/rbin/builds/R-${BUILD_VER}-check.log 2>&1
+# -- build R version
 
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-check.log
+echo "-- build R version ${BUILD_VER}"
 
 
-  # -- install build 
-  echo "-- install R ${BUILD_VER}"
+# - set up build area
+echo "   set up build scaffolding"
+mkdir -p /builds/R-${BUILD_VER} /builds/sources
 
-  make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log 2>&1
+# -- unpack tar
+echo "   unpack sources"
 
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.log
+cd /builds/sources
+tar -xf /sources/R/${XSOURCE}
 
+find /builds/sources/R-${BUILD_VER}/ -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.md5
 
-  find /opt/R/${BUILD_VER} -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
-
-  find /opt/R/${BUILD_VER} -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
-  gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
-
-
-  # -- initiate site library
-
-  echo "-- initiate R ${BUILD_VER} site library"
-
-  # identify lib directory .. sometime it is lib .. on others it is lib64 ... use ../R/library/base/DESCRIPTION (package) as trigger
-  RLIBX=$( find /opt/R/${BUILD_VER} -type f -name DESCRIPTION | grep "/R/library/base/DESCRIPTION$" | awk -F/ '{print $5}' )
+find /builds/sources/R-${BUILD_VER}/ -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
 
 
-  mkdir -p /opt/R/${BUILD_VER}/${RLIBX}/R/site-library
+# -- configure
+echo "   configure"
+
+cd /builds/R-${BUILD_VER}
+
+../sources/R-${BUILD_VER}/configure --prefix=/opt/R/${BUILD_VER} \
+                                    --enable-R-shlib \
+                                    --with-blas \
+                                    --with-lapack \
+                                    --with-recommended-packages=no > /logs/R/rbin/builds/R-${BUILD_VER}-config.log 2>&1
+
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-config.log
 
 
-  # -- secure the install location
-  echo "-- secure R ${BUILD_VER} installation"
+# -- build 
+echo "   build"
 
-  find /opt/R/${BUILD_VER} -type f -exec chmod u+r-wx,g+r-wx,o+r-wx {} \;
-  find /opt/R/${BUILD_VER} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+make > /logs/R/rbin/builds/R-${BUILD_VER}-make.log 2>&1
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-make.log
 
-  # -- open up site-library for writing
-  chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/${RLIBX}/R/site-library
 
-  # -- make R executable again 
-  find /opt/R/${BUILD_VER}/${RLIBX}/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
-  chmod u+rx-w,g+rx-w,o+rx-w /opt/R/${BUILD_VER}/bin/*
+# -- check build
+echo "   check build"
 
-  echo "-- R ${BUILD_VER} build and install completed"
+make check-all > /logs/R/rbin/builds/R-${BUILD_VER}-check.log 2>&1
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-check.log
 
-done
+
+# -- install build 
+
+echo "-- installing R version ${BUILD_VER}"
+
+make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log 2>&1
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.log
+
+
+find /opt/R/${BUILD_VER} -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
+
+find /opt/R/${BUILD_VER} -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
+gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
+
+
+# -- initiate site library
+echo "-- initiate site library"
+mkdir -p /opt/R/${BUILD_VER}/lib/R/site-library
+
+
+# -- secure the install location
+echo "-- secure install"
+find /opt/R/${BUILD_VER} -type f -exec chmod u+r-wx,g+r-wx,o+r-wx {} \;
+find /opt/R/${BUILD_VER} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+
+# -- open up site-library for writing
+echo "-- write enable site library"
+chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/lib/R/site-library
+
+# -- make R executable again 
+echo "-- enable R executables"
+find /opt/R/${BUILD_VER}/lib/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+chmod u+rx-w,g+rx-w,o+rx-w /opt/R/${BUILD_VER}/bin/*
+
+
+# -- add symbolic links
+echo "-- add symbolic links from /usr/bin"
+
+ln -s /opt/R/${BUILD_VER}/bin/R /usr/bin/R
+ln -s /opt/R/${BUILD_VER}/bin/Rscript /usr/bin/Rscript
 
 
 # -- clean up after build
