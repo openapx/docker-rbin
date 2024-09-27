@@ -64,9 +64,12 @@ gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-sources.sha256
 # -- configure
 echo "   configure"
 
+R_INSTALL_PATH=/opt/R/${BUILD_VER}
+
+
 cd /builds/R-${BUILD_VER}
 
-../sources/R-${BUILD_VER}/configure --prefix=/opt/R/${BUILD_VER} \
+../sources/R-${BUILD_VER}/configure --prefix=${R_INSTALL_PATH} \
                                     --enable-R-shlib \
                                     --with-blas \
                                     --with-lapack \
@@ -97,38 +100,42 @@ make install > /logs/R/rbin/builds/R-${BUILD_VER}-install.log 2>&1
 gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.log
 
 
-find /opt/R/${BUILD_VER} -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
+find ${R_INSTALL_PATH} -type f -exec md5sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
 gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.md5
 
-find /opt/R/${BUILD_VER} -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
+find ${R_INSTALL_PATH} -type f -exec sha256sum {} + > /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
 gzip -9 /logs/R/rbin/builds/R-${BUILD_VER}-install.sha256
 
 
 # -- initiate site library
 echo "-- initiate site library"
-mkdir -p /opt/R/${BUILD_VER}/lib/R/site-library
+
+# identify lib directory .. sometime it is lib .. on others it is lib64 ... use path ending in R/library/base/DESCRIPTION (base package) as trigger
+RLIBX=$( find ${R_INSTALL_PATH} -type f -name DESCRIPTION | grep "/R/library/base/DESCRIPTION$" | awk -F/ '{print $5}' )
+
+mkdir -p ${R_INSTALL_PATH}/${RLIBX}/R/site-library
 
 
 # -- secure the install location
 echo "-- secure install"
-find /opt/R/${BUILD_VER} -type f -exec chmod u+r-wx,g+r-wx,o+r-wx {} \;
-find /opt/R/${BUILD_VER} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+find ${R_INSTALL_PATH} -type f -exec chmod u+r-wx,g+r-wx,o+r-wx {} \;
+find ${R_INSTALL_PATH} -type d -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
 
 # -- open up site-library for writing
 echo "-- write enable site library"
-chmod u+rwx,g+rwx,o+rx-w /opt/R/${BUILD_VER}/lib/R/site-library
+chmod u+rwx,g+rwx,o+rx-w ${R_INSTALL_PATH}/${RLIBX}/R/site-library
 
 # -- make R executable again 
 echo "-- enable R executables"
-find /opt/R/${BUILD_VER}/lib/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
-chmod u+rx-w,g+rx-w,o+rx-w /opt/R/${BUILD_VER}/bin/*
+find ${R_INSTALL_PATH}/${RLIBX}/R/bin -type f -exec chmod u+rx-w,g+rx-w,o+rx-w {} \;
+chmod u+rx-w,g+rx-w,o+rx-w ${R_INSTALL_PATH}/bin/*
 
 
 # -- add symbolic links
 echo "-- add symbolic links from /usr/bin"
 
-ln -s /opt/R/${BUILD_VER}/bin/R /usr/bin/R
-ln -s /opt/R/${BUILD_VER}/bin/Rscript /usr/bin/Rscript
+ln -s ${R_INSTALL_PATH}/bin/R /usr/bin/R
+ln -s ${R_INSTALL_PATH}/bin/Rscript /usr/bin/Rscript
 
 
 # -- clean up after build
