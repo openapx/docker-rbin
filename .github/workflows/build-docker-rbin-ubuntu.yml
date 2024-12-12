@@ -54,6 +54,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            OPENAPX_CONTAINERID=${{ github.repository_owner }}-rbin-${{ vars.VERSION_MAJOR }}.${{ vars.VERSION_MINOR }}-dev.${{ github.run_id}}-${{ env.OS_TAG }}
           file: docker/rbin/Dockerfile-rbin-${{ env.OS_TAG }}
           push: true
           tags: |
@@ -68,6 +70,8 @@ jobs:
         uses: docker/build-push-action@v5
         with:
           context: .
+          build-args: |
+            OPENAPX_CONTAINERID=${{ github.repository_owner }}-rbin-${{ vars.VERSION_MAJOR}}.${{ vars.VERSION_MINOR }}.${{ github.run_number}}-${{ github.sha}}-${{ env.OS_TAG }}
           file: docker/rbin/Dockerfile-rbin-${{ env.OS_TAG }}
           push: true
           tags: |
