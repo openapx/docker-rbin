@@ -1,6 +1,10 @@
 # For now ... rely on latest rockylinux baseline OS
 FROM openapx/baseline-os:latest-rockylinux
 
+# -- container ID
+ARG OPENAPX_CONTAINERID="rbin-unknown"
+
+
 # -- add license file to root directory
 COPY LICENSE /LICENSE-rbin
 RUN  chmod u+r-wx,g+r-wx,o+r-wx /LICENSE-rbin
@@ -23,7 +27,8 @@ RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; 
 #    6) clean-up
 
 COPY --chmod=755 scripts/rbin/build_r.sh /scripts/rbin/
-RUN dnf config-manager --enable crb && \
+RUN /opt/openapx/utilities/container-id.sh && \
+    dnf config-manager --enable crb && \
     /opt/openapx/utilities/bin-libs.sh /opt/openapx/config/rbin/libs-rockylinux && \
     /scripts/rbin/build_r.sh && \
     find /logs/R/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; && \
