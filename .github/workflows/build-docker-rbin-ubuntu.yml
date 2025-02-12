@@ -14,6 +14,7 @@ on:
       - scripts/rbin/*
       - docker/rbin/Dockerfile-rbin-ubuntu
       - .github/workflows/build-docker-rbin-ubuntu.yml
+  workflow_dispatch:
 
 env:
   OS_TAG: "ubuntu"
