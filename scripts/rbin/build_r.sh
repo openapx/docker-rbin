@@ -1,5 +1,8 @@
 #! /bin/bash
 
+
+
+
 # -- set up working directories
 mkdir -p /sources/R /builds /logs/R/rbin/builds
 
@@ -8,18 +11,31 @@ REPO=https://cran.r-project.org/src/base/R-4
 
 
 # -- identify R verison to build
-echo "-- identify R version"
 
-XSOURCE=$( wget -q -O - ${REPO}/ | \
-           grep -io '<a href=['"'"'"][^"'"'"']*['"'"'"]' | \
-           sed -e 's/^<a href=["'"'"']//i' -e 's/["'"'"']$//i' | \
-           grep "^R-.*.tar.gz$" | \
-           sort -r | \
-           head -n1 )
+echo "-- Identifying R version"
 
-BUILD_VER=$(echo ${XSOURCE} | sed -n 's/^R-\(.*\).tar.gz$/\1/p')
+BUILD_VER=
 
-echo "   R version ${BUILD_VER}"
+if [ -z "${OPENAPX_RVERTARGET}" ]; then
+
+  XSOURCE=$( wget -q -O - ${REPO}/ | \
+             grep -io '<a href=['"'"'"][^"'"'"']*['"'"'"]' | \
+             sed -e 's/^<a href=["'"'"']//i' -e 's/["'"'"']$//i' | \
+             grep "^R-.*.tar.gz$" | \
+             sort -r | \
+             head -n1 )
+
+  BUILD_VER=$(echo ${XSOURCE} | sed -n 's/^R-\(.*\).tar.gz$/\1/p')
+
+  echo "   Latest R version on CRAN is ${BUILD_VER}"
+ 
+else
+
+  BUILD_VER=${OPENAPX_RVERTARGET}
+
+fi
+
+echo "   R version ${BUILD_VER} selected"
 
 
 
