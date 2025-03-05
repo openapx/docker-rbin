@@ -1,9 +1,9 @@
-# For now ... rely on latest ubuntu baseline OS
+# For now ... rely on latest fedora baseline OS
 FROM openapx/baseline-os:latest-fedora
 
 # -- container ID
 ARG OPENAPX_CONTAINERID="rbin-unknown"
-
+ARG OPENAPX_RVERTARGET="0.0.0"
 
 # -- add license file to root directory
 COPY LICENSE /LICENSE-rbin
@@ -13,7 +13,7 @@ RUN  chmod u+r-wx,g+r-wx,o+r-wx /LICENSE-rbin
 # -- configuration files
 #    note: this is the input location for Shell scripts below
 
-COPY libs-fedora r_versions /opt/openapx/config/rbin/
+COPY libs-fedora /opt/openapx/config/rbin/
 
 RUN find /opt/openapx/config/rbin -type f -exec chmod u+r-wx,g+r-wx,o-rwx {} \; && \
     find /opt/openapx/config/rbin -type d -exec chmod u+rx-w,g+rx-w,o-rwx {} \;
