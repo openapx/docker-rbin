@@ -14,7 +14,8 @@ REPO=https://cran.r-project.org/src/base/R-4
 
 echo "-- Identifying R version"
 
-BUILD_VER=
+BUILD_VER=unknown
+XSOURCE=unknown
 
 if [ -z "${OPENAPX_RVERTARGET}" ]; then
 
@@ -32,7 +33,8 @@ if [ -z "${OPENAPX_RVERTARGET}" ]; then
 else
 
   BUILD_VER=${OPENAPX_RVERTARGET}
-
+  XSOURCE=R-${BUILD_VER}.tar.gz
+  
   echo "   R version defined by matrix"
 
 fi
@@ -43,7 +45,7 @@ echo "   R version ${BUILD_VER}"
 
 # -- download 
 
-URL=${REPO}/R-${BUILD_VER}.tar.gz
+URL=${REPO}/${XSOURCE}
 echo "-- downloading ${URL}"
 wget --no-check-certificate --quiet --directory-prefix=/sources/R ${URL}
 
