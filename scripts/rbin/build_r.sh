@@ -8,7 +8,7 @@ mkdir -p /sources/R /builds /logs/R/rbin/builds
 
 # -- R source repository
 REPO=https://cran.r-project.org/src/base/R-4
-
+     
 
 # -- identify R verison to build
 
@@ -27,21 +27,23 @@ if [ -z "${OPENAPX_RVERTARGET}" ]; then
 
   BUILD_VER=$(echo ${XSOURCE} | sed -n 's/^R-\(.*\).tar.gz$/\1/p')
 
-  echo "   Latest R version on CRAN is ${BUILD_VER}"
+  echo "   Latest R version on CRAN"
  
 else
 
   BUILD_VER=${OPENAPX_RVERTARGET}
 
+  echo "   R version defined by matrix"
+
 fi
 
-echo "   R version ${BUILD_VER} selected"
+echo "   R version ${BUILD_VER}"
 
 
 
 # -- download 
 
-URL=${REPO}/${XSOURCE}
+URL=${REPO}/R-${BUILD_VER}.tar.gz
 echo "-- downloading ${URL}"
 wget --no-check-certificate --quiet --directory-prefix=/sources/R ${URL}
 
